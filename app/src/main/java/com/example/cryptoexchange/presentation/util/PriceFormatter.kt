@@ -21,6 +21,24 @@ object PriceFormatter {
         return "$$formatted"
     }
 
+    fun formatPercentChange(change: Double?): String {
+        if (change == null || !change.isFinite()) return "—"
+        val rounded = BigDecimal.valueOf(change)
+            .setScale(2, RoundingMode.HALF_UP)
+            .toPlainString()
+        return if (change > 0) "+$rounded%" else "$rounded%"
+    }
+
+    fun formatMarketCap(capUsd: Double?): String {
+        if (capUsd == null || !capUsd.isFinite() || capUsd <= 0.0) return "Немає даних"
+        return when {
+            capUsd >= 1_000_000_000_000.0 -> String.format(Locale.US, "$%.2fT", capUsd / 1_000_000_000_000.0)
+            capUsd >= 1_000_000_000.0 -> String.format(Locale.US, "$%.2fB", capUsd / 1_000_000_000.0)
+            capUsd >= 1_000_000.0 -> String.format(Locale.US, "$%.2fM", capUsd / 1_000_000.0)
+            else -> formatUsd(capUsd)
+        }
+    }
+
     fun formatTimestamp(millis: Long?): String {
         if (millis == null || millis <= 0L) return "Ще не оновлювалося"
         val formatter = SimpleDateFormat("dd.MM.yyyy HH:mm:ss", Locale.getDefault())
