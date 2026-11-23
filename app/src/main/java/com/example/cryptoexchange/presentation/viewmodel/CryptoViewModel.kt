@@ -7,6 +7,7 @@ import com.example.cryptoexchange.domain.scheduler.CryptoSyncScheduler
 import com.example.cryptoexchange.domain.usecase.ObserveCryptoAssetsUseCase
 import com.example.cryptoexchange.domain.usecase.TriggerManualSyncUseCase
 import com.example.cryptoexchange.presentation.state.CryptoUiState
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
@@ -18,14 +19,21 @@ class CryptoViewModel(
     syncScheduler: CryptoSyncScheduler
 ) : ViewModel() {
 
+    private val selectedAssetId = MutableStateFlow<String?>(null)
+    private val searchQuery = MutableStateFlow("")
+
     val uiState: StateFlow<CryptoUiState> = combine(
         observeCryptoAssetsUseCase(),
-        syncScheduler.observeSyncStatus()
-    ) { assets, status ->
+        syncScheduler.observeSyncStatus(),
+        selectedAssetId,
+        searchQuery
+    ) { assets, status, selectedId, query ->
         CryptoUiState(
             assets = assets,
             syncStatus = status,
-            lastUpdatedMillis = assets.maxOfOrNull { it.updatedAtMillis }
+            lastUpdatedMillis = assets.maxOfOrNull { it.updatedAtMillis },
+            selectedAssetId = selectedId,
+            searchQuery = query
         )
     }.stateIn(
         scope = viewModelScope,
@@ -35,6 +43,18 @@ class CryptoViewModel(
 
     fun onRefreshClick() {
         triggerManualSyncUseCase()
+    }
+
+    fun onAssetClick(assetId: String) {
+        selectedAssetId.value = assetId
+    }
+
+    fun onBackFromDetail() {
+        selectedAssetId.value = null
+    }
+
+    fun onSearchQueryChange(query: String) {
+        searchQuery.value = query
     }
 
     companion object {

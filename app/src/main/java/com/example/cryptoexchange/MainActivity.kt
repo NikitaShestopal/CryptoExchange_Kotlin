@@ -31,7 +31,10 @@ class MainActivity : ComponentActivity() {
                 val uiState by viewModel.uiState.collectAsStateWithLifecycle()
                 CryptoListScreen(
                     uiState = uiState,
-                    onRefreshClick = viewModel::onRefreshClick
+                    onRefreshClick = viewModel::onRefreshClick,
+                    onAssetClick = viewModel::onAssetClick,
+                    onBackFromDetail = viewModel::onBackFromDetail,
+                    onSearchQueryChange = viewModel::onSearchQueryChange
                 )
             }
         }
