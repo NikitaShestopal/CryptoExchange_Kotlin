@@ -7,5 +7,9 @@ data class CryptoAsset(
     val symbol: String,
     val logoUrl: String?,
     val priceUsd: Double?,
-    val updatedAtMillis: Long
+    val updatedAtMillis: Long,
+    val low24h: Double? = null,
+    val high24h: Double? = null,
+    val priceChangePercent24h: Double? = null,
+    val marketCapUsd: Double? = null
 )
