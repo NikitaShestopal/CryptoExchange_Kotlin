@@ -4,7 +4,10 @@ import android.content.Context
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
-import com.example.cryptoexchange.CryptoExchangeApp
+import com.example.cryptoexchange.BuildConfig
+import com.example.cryptoexchange.data.local.CryptoDatabase
+import com.example.cryptoexchange.data.remote.CoinGeckoNetworkFactory
+import com.example.cryptoexchange.data.repository.CryptoRepositoryImpl
 import com.example.cryptoexchange.domain.model.SyncResult
 
 class CryptoSyncWorker(
@@ -13,10 +16,14 @@ class CryptoSyncWorker(
 ) : CoroutineWorker(appContext, params) {
 
     override suspend fun doWork(): Result {
-        val app = applicationContext as CryptoExchangeApp
-        val syncUseCase = app.container.syncCryptoAssetsUseCase
+        val api = CoinGeckoNetworkFactory.createApi(
+            apiKey = BuildConfig.COINGECKO_API_KEY,
+            isDebug = BuildConfig.DEBUG
+        )
+        val dao = CryptoDatabase.build(applicationContext).cryptoDao()
+        val repository = CryptoRepositoryImpl(api = api, dao = dao)
 
-        return when (val result = syncUseCase()) {
+        return when (val result = repository.syncTopAssets()) {
             is SyncResult.Success -> Result.success()
 
             is SyncResult.AuthError -> {
