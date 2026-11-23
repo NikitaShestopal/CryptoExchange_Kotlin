@@ -113,7 +113,7 @@ fun CryptoAssetCard(
                     fontWeight = FontWeight.SemiBold,
                     color = MaterialTheme.colorScheme.onSurface
                 )
-                PercentBadge(change = asset.changePercent24h)
+                PercentBadge(change = asset.priceChangePercent24h)
             }
         }
 
