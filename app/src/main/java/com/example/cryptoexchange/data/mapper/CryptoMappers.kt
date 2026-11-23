@@ -15,6 +15,10 @@ fun CoinGeckoAssetDto.toEntity(
     if (cleanSymbol.isEmpty() && cleanName.isEmpty()) return null
 
     val validPrice = currentPrice?.takeIf { it.isFinite() && it >= 0.0 }
+    val validLow = low24h?.takeIf { it.isFinite() && it >= 0.0 }
+    val validHigh = high24h?.takeIf { it.isFinite() && it >= 0.0 }
+    val validChange = priceChangePercentage24h?.takeIf { it.isFinite() }
+    val validMarketCap = marketCap?.takeIf { it.isFinite() && it >= 0.0 }
     val cleanLogo = image?.trim()?.takeIf { it.isNotEmpty() }
     val resolvedRank = marketCapRank?.takeIf { it > 0 } ?: fallbackRank
 
@@ -25,7 +29,11 @@ fun CoinGeckoAssetDto.toEntity(
         symbol = cleanSymbol.ifEmpty { cleanName },
         logoUrl = cleanLogo,
         priceUsd = validPrice,
-        updatedAtMillis = updatedAtMillis
+        updatedAtMillis = updatedAtMillis,
+        low24h = validLow,
+        high24h = validHigh,
+        priceChangePercent24h = validChange,
+        marketCapUsd = validMarketCap
     )
 }
 
@@ -36,5 +44,9 @@ fun CryptoAssetEntity.toDomain(): CryptoAsset = CryptoAsset(
     symbol = symbol,
     logoUrl = logoUrl,
     priceUsd = priceUsd,
-    updatedAtMillis = updatedAtMillis
+    updatedAtMillis = updatedAtMillis,
+    low24h = low24h,
+    high24h = high24h,
+    priceChangePercent24h = priceChangePercent24h,
+    marketCapUsd = marketCapUsd
 )

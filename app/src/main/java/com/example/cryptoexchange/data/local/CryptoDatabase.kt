@@ -7,7 +7,7 @@ import androidx.room.RoomDatabase
 
 @Database(
     entities = [CryptoAssetEntity::class],
-    version = 1,
+    version = 2,
     exportSchema = false
 )
 abstract class CryptoDatabase : RoomDatabase() {
@@ -19,7 +19,9 @@ abstract class CryptoDatabase : RoomDatabase() {
                 context.applicationContext,
                 CryptoDatabase::class.java,
                 "crypto_exchange.db"
-            ).build()
+            )
+                .fallbackToDestructiveMigration()
+                .build()
         }
     }
 }
